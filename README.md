@@ -162,7 +162,7 @@ sql
 - title (varchar 25)
 - description (text)
 - status (enum: todo, in_progress, done)
-- dateline (date)
+- deadline (date)
 - created_by (varchar 25)
 - created_at
 - updated_at
@@ -171,8 +171,9 @@ Users memiliki banyak Tasks (One-to-Many)
 Tasks dimiliki oleh satu User (Many-to-One)
 
 # Tampilan Utama
-![Login Page](Halaman_login.png)
-![Main Page](Halaman_Utama.png)
+![Login Page](screenshot/Halaman_login.png)
+![Main Page](screenshot/Halaman_Utama.png)
+![taskCRUD](screensshot/TaskCRUD.png)
 
 ## Docker Setup
  

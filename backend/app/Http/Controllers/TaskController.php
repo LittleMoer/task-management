@@ -14,18 +14,49 @@ class TaskController extends Controller
             $query = Task::with('user:user_id,name')
                 ->where('user_id', auth('api')->id());
 
-            // Filter by status
             if ($request->has('status') && $request->status) {
                 $query->where('status', $request->status);
             }
 
-            // Search by title or description
             if ($request->has('search') && $request->search) {
                 $searchTerm = '%' . $request->search . '%';
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('title', 'like', $searchTerm)
                         ->orWhere('description', 'like', $searchTerm);
                 });
+            }
+
+            if ($request->has('deadline_from') && $request->deadline_from) {
+                $query->where('deadline', '>=', $request->deadline_from);
+            }
+            
+            if ($request->has('deadline_to') && $request->deadline_to) {
+                $query->where('deadline', '<=', $request->deadline_to);
+            }
+            
+            if ($request->has('deadline_range') && $request->deadline_range) {
+                $today = now()->format('Y-m-d');
+                
+                switch ($request->deadline_range) {
+                    case 'today':
+                        $query->where('deadline', $today);
+                        break;
+                    case 'week':
+                        $query->whereBetween('deadline', [
+                            now()->startOfWeek()->format('Y-m-d'),
+                            now()->endOfWeek()->format('Y-m-d')
+                        ]);
+                        break;
+                    case 'month':
+                        $query->whereBetween('deadline', [
+                            now()->startOfMonth()->format('Y-m-d'),
+                            now()->endOfMonth()->format('Y-m-d')
+                        ]);
+                        break;
+                    case 'overdue':
+                        $query->where('deadline', '<', $today);
+                        break;
+                }
             }
 
             $tasks = $query->get();
@@ -45,7 +76,7 @@ class TaskController extends Controller
                 'title' => 'required|string',
                 'description' => 'required|string',
                 'status' => 'required|string',
-                'dateline' => 'required|string',
+                'deadline' => 'required|string',
             ]);
 
             $task = Task::create([
@@ -53,7 +84,7 @@ class TaskController extends Controller
                 'title' => $data['title'],
                 'description' => $data['description'],
                 'status' => $data['status'],
-                'dateline' => $data['dateline'],
+                'deadline' => $data['deadline'],
                 'created_by' => auth('api')->user()->name,
             ]);
 
@@ -74,7 +105,7 @@ class TaskController extends Controller
                 'title' => 'required|string',
                 'description' => 'required|string',
                 'status' => 'required|string',
-                'dateline' => 'required|string',
+                'deadline' => 'required|string',
             ]);
 
             $task = Task::where('task_id', $data['task_id'])
@@ -85,7 +116,7 @@ class TaskController extends Controller
                 'title' => $data['title'],
                 'description' => $data['description'],
                 'status' => $data['status'],
-                'dateline' => $data['dateline'],
+                'deadline' => $data['deadline'],
             ]);
 
             return response()->json($task, 200);

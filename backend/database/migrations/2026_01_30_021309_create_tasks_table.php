@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('title', 25);
             $table->text('description');
             $table->enum('status', ['todo', 'in_progress', 'done'])->default('todo');
-            $table->date('dateline');
+            $table->date('deadline');
             $table->string('created_by', 25);
             $table->timestamps();
         });

@@ -31,8 +31,8 @@
 
               <!-- Filter Section -->
               <div v-if="showFilter" class="mb-3 p-3 bg-light rounded">
-                <div class="row g-2">
-                  <div class="col-md-4">
+                <div class="row mb-3">
+                  <div class="col-md-3">
                     <select v-model="filter.status" class="form-select form-select-sm">
                       <option value="">All Status</option>
                       <option value="todo">Todo</option>
@@ -40,12 +40,22 @@
                       <option value="done">Done</option>
                     </select>
                   </div>
-                  <div class="col-md-4">
-                    <input v-model="filter.search" type="text" class="form-control form-control-sm"
-                      placeholder="Search...">
+                  <div class="col-md-3">
+                    <select v-model="filter.deadlineRange" class="form-select form-select-sm">
+                      <option value="">All Deadlines</option>
+                      <option value="today">Today</option>
+                      <option value="week">This Week</option>
+                      <option value="month">This Month</option>
+                      <option value="overdue">Overdue</option>
+                    </select>
                   </div>
-                  <div class="col-md-4">
-                    <button class="btn btn-sm btn-secondary" @click="clearFilter">Clear</button>
+                  <div class="col-md-3">
+                    <input v-model="filter.deadlineFrom" type="date" class="form-control form-control-sm"
+                      placeholder="From">
+                  </div>
+                  <div class="col-md-3">
+                    <input v-model="filter.deadlineTo" type="date" class="form-control form-control-sm"
+                      placeholder="To">
                   </div>
                 </div>
               </div>
@@ -88,7 +98,7 @@
                         </div>
                       </div>
                       <div class="text-muted small mb-2">
-                        Status: {{ task.status }} | Deadline: {{ formatDate(task.dateline) }}
+                        Status: {{ task.status }} | Deadline: {{ formatDate(task.deadline) }}
                       </div>
                       <div class="text-muted small mb-2">{{ task.description }}</div>
                       <div class="small">
@@ -132,7 +142,7 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Deadline</label>
-                <input v-model="newTask.dateline" type="date" class="form-control">
+                <input v-model="newTask.deadline" type="date" class="form-control">
               </div>
             </form>
           </div>
@@ -172,7 +182,7 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Deadline</label>
-                <input v-model="currentTask.dateline" type="date" class="form-control">
+                <input v-model="currentTask.deadline" type="date" class="form-control">
               </div>
             </form>
           </div>
@@ -207,7 +217,7 @@ const currentTask = ref(null);
 
 const formatDate = (dateString) => {
   if (!dateString) return 'No deadline';
-  
+
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -218,7 +228,10 @@ const formatDate = (dateString) => {
 
 const filter = ref({
   status: '',
-  search: ''
+  search: '',
+  deadlineRange: '',
+  deadlineFrom: '',
+  deadlineTo: ''
 });
 
 const filteredTasks = computed(() => {
@@ -227,7 +240,45 @@ const filteredTasks = computed(() => {
     const matchesSearch = !filter.value.search ||
       task.title.toLowerCase().includes(filter.value.search.toLowerCase()) ||
       task.description.toLowerCase().includes(filter.value.search.toLowerCase());
-    return matchesStatus && matchesSearch;
+    
+    let matchesDeadline = true;
+    
+    if (filter.value.deadlineRange) {
+      const today = new Date();
+      const taskDeadline = new Date(task.deadline);
+      
+      switch (filter.value.deadlineRange) {
+        case 'today':
+          matchesDeadline = taskDeadline.toDateString() === today.toDateString();
+          break;
+        case 'week':
+          const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+          const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+          matchesDeadline = taskDeadline >= weekStart && taskDeadline <= weekEnd;
+          break;
+        case 'month':
+          matchesDeadline = taskDeadline.getMonth() === today.getMonth() && 
+                           taskDeadline.getFullYear() === today.getFullYear();
+          break;
+        case 'overdue':
+          matchesDeadline = taskDeadline < today;
+          break;
+      }
+    }
+    
+    if (filter.value.deadlineFrom) {
+      const fromDate = new Date(filter.value.deadlineFrom);
+      const taskDeadline = new Date(task.deadline);
+      matchesDeadline = matchesDeadline && taskDeadline >= fromDate;
+    }
+    
+    if (filter.value.deadlineTo) {
+      const toDate = new Date(filter.value.deadlineTo);
+      const taskDeadline = new Date(task.deadline);
+      matchesDeadline = matchesDeadline && taskDeadline <= toDate;
+    }
+    
+    return matchesStatus && matchesSearch && matchesDeadline;
   });
 });
 
@@ -235,7 +286,7 @@ const newTask = ref({
   title: '',
   description: '',
   status: 'todo',
-  dateline: ''
+  deadline: ''
 });
 
 // Load functions
@@ -246,10 +297,18 @@ const loadMe = async () => {
 
 const loadTasks = async () => {
   try {
-    const { data } = await api.get('/dashboard');
-    tasks.value = data;
+    const params = {};
+    
+    if (filter.value.status) params.status = filter.value.status;
+    if (filter.value.search) params.search = filter.value.search;
+    if (filter.value.deadlineRange) params.deadline_range = filter.value.deadlineRange;
+    if (filter.value.deadlineFrom) params.deadline_from = filter.value.deadlineFrom;
+    if (filter.value.deadlineTo) params.deadline_to = filter.value.deadlineTo;
+    
+    const response = await api.get('/dashboard', { params });
+    tasks.value = response.data;
   } catch (error) {
-    console.error('Load tasks failed:', error.response?.data);
+    console.error('Load tasks failed:', error);
   }
 };
 
@@ -276,7 +335,7 @@ const createTask = async () => {
     console.log('Task created:', response.data);
 
     showCreateModal.value = false;
-    newTask.value = { title: '', description: '', status: 'todo', dateline: '' };
+    newTask.value = { title: '', description: '', status: 'todo', deadline: '' };
     await loadTasks();
   } catch (error) {
     console.error('Create failed:', error.response?.data);
@@ -290,7 +349,7 @@ const updateTask = async () => {
       title: currentTask.value.title,
       description: currentTask.value.description,
       status: currentTask.value.status,
-      dateline: currentTask.value.dateline,
+      deadline: currentTask.value.deadline,
     });
 
     showEditModal.value = false;
@@ -301,7 +360,13 @@ const updateTask = async () => {
 };
 
 const clearFilter = () => {
-  filter.value = { status: '', search: '' };
+  filter.value = {
+    status: '',
+    search: '',
+    deadlineRange: '',
+    deadlineFrom: '',
+    deadlineTo: ''
+  };
 };
 
 const onLogout = async () => {
