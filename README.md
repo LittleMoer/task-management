@@ -180,7 +180,7 @@ docker-compose up -d --build
 Production
 bash
 # Setup production
-docker-compose -f docker-compose.prod.yml up -d --build
+docker-compose -f docker-compose.prod.yaml up -d --build
  
 # Akses aplikasi
 # http://localhost (dengan nginx)

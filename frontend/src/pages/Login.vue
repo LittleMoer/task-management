@@ -20,6 +20,10 @@
 
                 <button type="submit" class="btn btn-primary w-100">Login</button>
 
+                <button type="button" @click="goRegister" class="btn btn-outline-secondary w-100">
+                  Register
+                </button>
+
                 <p v-if="error" class="text-danger text-center small mb-0">{{ error }}</p>
               </form>
             </div>
@@ -43,5 +47,9 @@ const onSubmit = async () => {
     localStorage.setItem('access_token', data.access_token);
     router.push({ name: 'dashboard' });
   } catch { error.value = 'Invalid credentials'; }
+};
+
+const goRegister = () => {
+  router.push({ name: 'register' });
 };
 </script>
