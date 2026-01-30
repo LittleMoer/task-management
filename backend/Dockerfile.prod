@@ -1,0 +1,44 @@
+# backend/Dockerfile.prod
+FROM php:8.2-fpm-alpine
+
+# Install dependencies
+RUN apk add --no-cache \
+    git \
+    curl \
+    libpng-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    zip \
+    unzip
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy existing application directory contents
+COPY . /var/www/html
+
+# Install production dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Generate application key
+RUN php artisan key:generate
+
+# Optimize for production
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html/storage
+RUN chmod -R 755 /var/www/html/bootstrap/cache
+
+EXPOSE 9000
+
+CMD ["php-fpm"]
