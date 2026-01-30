@@ -64,7 +64,7 @@
               </div>
 
               <div v-else class="row g-3">
-                <div class="col-12 col-md-6 col-lg-4" v-for="task in tasks" :key="task.task_id">
+                <div class="col-12 col-md-6 col-lg-4" v-for="task in filteredTasks" :key="task.task_id">
                   <div class="card border-0 shadow-sm">
                     <div class="card-body p-3">
                       <div class="d-flex justify-content-between align-items-start mb-2">
@@ -88,8 +88,9 @@
                         </div>
                       </div>
                       <div class="text-muted small mb-2">
-                        Status: {{ task.status }} | Deadline: {{ task.dateline }}
+                        Status: {{ task.status }} | Deadline: {{ formatDate(task.dateline) }}
                       </div>
+                      <div class="text-muted small mb-2">{{ task.description }}</div>
                       <div class="small">
                         Created by: {{ task.user?.name }}
                       </div>
@@ -124,9 +125,9 @@
               <div class="mb-3">
                 <label class="form-label">Status</label>
                 <select v-model="newTask.status" class="form-select">
-                  <option value="todo">todo</option>
-                  <option value="in_progress">in progress</option>
-                  <option value="done">done</option>
+                  <option value="todo">Todo</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="done">Done</option>
                 </select>
               </div>
               <div class="mb-3">
@@ -164,9 +165,9 @@
               <div class="mb-3">
                 <label class="form-label">Status</label>
                 <select v-model="currentTask.status" class="form-select">
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
+                  <option value="todo">Todo</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="done">Done</option>
                 </select>
               </div>
               <div class="mb-3">
@@ -204,13 +205,23 @@ const showCreateModal = ref(false);
 const showEditModal = ref(false);
 const currentTask = ref(null);
 
+const formatDate = (dateString) => {
+  if (!dateString) return 'No deadline';
+  
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
 const filter = ref({
   status: '',
   search: ''
 });
 
 const filteredTasks = computed(() => {
-  // Filter di frontend saja
   return tasks.value.filter(task => {
     const matchesStatus = !filter.value.status || task.status === filter.value.status;
     const matchesSearch = !filter.value.search ||
@@ -223,7 +234,7 @@ const filteredTasks = computed(() => {
 const newTask = ref({
   title: '',
   description: '',
-  status: 'pending',
+  status: 'todo',
   dateline: ''
 });
 
@@ -263,11 +274,12 @@ const createTask = async () => {
   try {
     const response = await api.post('/dashboard/create', newTask.value);
     console.log('Task created:', response.data);
+
     showCreateModal.value = false;
     newTask.value = { title: '', description: '', status: 'todo', dateline: '' };
     await loadTasks();
   } catch (error) {
-    console.error('Create failed:', error);
+    console.error('Create failed:', error.response?.data);
   }
 };
 
@@ -287,9 +299,9 @@ const updateTask = async () => {
     console.error('Update failed:', error.response?.data);
   }
 };
+
 const clearFilter = () => {
   filter.value = { status: '', search: '' };
-  loadTasks();
 };
 
 const onLogout = async () => {
