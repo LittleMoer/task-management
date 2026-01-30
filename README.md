@@ -7,71 +7,30 @@ Aplikasi ini dibangun dengan arsitektur backend Laravel dan frontend Vue.js.
 
 
 # Fitur Utama
-Authentication - Login dan logout dengan JWT token
-
-
-Task Management - Buat, baca, update, dan hapus task
-
-
-Filter & Search - Filter berdasarkan status dan search task
-
-
-Responsive Design - Tampilan yang optimal di desktop dan mobile
-
-
-Real-time Updates - Perubahan langsung terlihat tanpa refresh
-
-
+- Authentication - Login dan logout dengan JWT token
+- Task Management - Buat, baca, update, dan hapus task
+- Filter & Search - Filter berdasarkan status dan deadline
+- Responsive Design - Tampilan yang optimal di desktop dan mobile
+- Real-time Updates - Perubahan langsung terlihat tanpa refresh
 # Teknologi yang Digunakan
-Backend
-
-
-Laravel 12.0 - PHP Framework
-
-
-MySQL - Database
-
-
-JWT Auth - Authentication system
-
-
-PHP 8.2+ - Runtime
-
-
-Frontend
-
-
-Vue 3 - JavaScript Framework
-
-
-Vue Router - Client-side routing
-
-
-Axios - HTTP Client
-
-
-Bootstrap 5 - CSS Framework
-
-
-Vite - Build Tool
-
-
+- Backend
+- Laravel 12.0 - PHP Framework
+- Laravel MySQL - Database
+- JWT Auth - Authentication system
+- PHP 8.2+ - Runtime
+- Frontend
+- Vue 3 - JavaScript Framework
+- Vue Router - Client-side routing
+- Axios - HTTP Client
+- Bootstrap 5 - CSS Framework
+- Vite - Build Tool
 # Persyaratan Sistem
-PHP 8.2 atau lebih tinggi
-
-
-Composer
-
-
-Node.js 18+ dan npm
-
-
-MySQL/MariaDB
-
-
-Git
-
-
+- PHP 8.2 atau lebih tinggi
+- Composer
+- Node.js 18+ dan npm
+- Docker
+- MySQL/MariaDB
+- Git
 # Langkah Instalasi
 
 
@@ -107,11 +66,22 @@ php artisan key:generate
  
 ### Setup database di .env
 DB_CONNECTION=mysql
+
+
 DB_HOST=127.0.0.1
+
+
 DB_PORT=3306
+
+
 DB_DATABASE=task-management
+
+
 DB_USERNAME=root
+
+
 DB_PASSWORD=
+
  
 ### Run migration
 php artisan migrate
@@ -141,21 +111,36 @@ Backend API: http://localhost:8000
 # Informasi Login Dummy
 Gunakan akun berikut untuk login:
 
+
 Username: Ardiyan
+
+
 Password: diyan123
+
+
 atau menggunakan endpoint register
+
+
 http://localhost:8000/register
 
 # Struktur Database
 Users Table
+
+
 sql
+
+
 - user_id (Primary Key)
 - username
 - email
 - password (hashed)
 - created_at
 - updated_at
+
+
 Tasks Table
+
+
 sql
 - task_id (Primary Key)
 - user_id (Foreign Key)
@@ -168,12 +153,14 @@ sql
 - updated_at
 ## Relationship
 Users memiliki banyak Tasks (One-to-Many)
+
+
 Tasks dimiliki oleh satu User (Many-to-One)
 
 # Tampilan Utama
 ![Login Page](screenshot/Halaman_login.png)
 ![Main Page](screenshot/Halaman_Utama.png)
-![taskCRUD](screensshot/TaskCRUD.png)
+![taskCRUD](screenshot/TaskCRUD.png)
 
 ## Docker Setup
  
