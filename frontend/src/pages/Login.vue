@@ -1,12 +1,35 @@
 <template>
-  <form @submit.prevent="onSubmit">
-    <h1>Login</h1>
-    <input v-model="username" placeholder="Username" />
-    <input v-model="password" type="password" placeholder="Password" />
-    <button type="submit">Login</button>
-    <p v-if="error" style="color:red">{{ error }}</p>
-  </form>
+  <div class="min-vh-100 d-flex align-items-center bg-light"> 
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+          <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+              <h1 class="h4 text-center mb-4">Login</h1>
+
+              <form @submit.prevent="onSubmit" class="d-grid gap-3">
+                <div>
+                  <label class="form-label">Username</label>
+                  <input v-model="username" class="form-control" placeholder="Username" />
+                </div>
+
+                <div>
+                  <label class="form-label">Password</label>
+                  <input v-model="password" type="password" class="form-control" placeholder="Password" />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+
+                <p v-if="error" class="text-danger text-center small mb-0">{{ error }}</p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
+
 <script setup>
 import { ref } from 'vue';
 import api from '../lib/api';
