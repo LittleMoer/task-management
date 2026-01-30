@@ -71,9 +71,10 @@ Backend API: http://localhost:8000
 # Informasi Login Dummy
 Gunakan akun berikut untuk login:
 
-Username: admin
-Password: password
-Atau register akun baru melalui halaman login.
+Username: Ardiyan
+Password: diyan123
+atau menggunakan endpoint register
+http://localhost:8000/register
 
 # Struktur Database
 Users Table
@@ -101,7 +102,7 @@ Tasks dimiliki oleh satu User (Many-to-One)
 
 # Tampilan Utama
 ![Login Page](Halaman_login.png)
-![Main Page](Halaman_utama.png)
+![Main Page](Halaman_Utama.png)
 
 ## Docker Setup
  
