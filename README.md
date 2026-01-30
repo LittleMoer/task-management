@@ -1,38 +1,100 @@
 # Task Management System
-Aplikasi manajemen tugas berbasis web dengan fitur CRUD (Create, Read, Update, Delete) untuk mengelola task secara personal. Aplikasi ini dibangun dengan arsitektur backend Laravel dan frontend Vue.js.
+Aplikasi manajemen tugas berbasis web dengan fitur CRUD (Create, Read, Update, Delete) untuk mengelola task secara personal. 
+
+
+Aplikasi ini dibangun dengan arsitektur backend Laravel dan frontend Vue.js.
+
+
 
 # Fitur Utama
 Authentication - Login dan logout dengan JWT token
+
+
 Task Management - Buat, baca, update, dan hapus task
+
+
 Filter & Search - Filter berdasarkan status dan search task
+
+
 Responsive Design - Tampilan yang optimal di desktop dan mobile
+
+
 Real-time Updates - Perubahan langsung terlihat tanpa refresh
+
+
 # Teknologi yang Digunakan
 Backend
+
+
 Laravel 12.0 - PHP Framework
+
+
 MySQL - Database
+
+
 JWT Auth - Authentication system
+
+
 PHP 8.2+ - Runtime
+
+
 Frontend
+
+
 Vue 3 - JavaScript Framework
+
+
 Vue Router - Client-side routing
+
+
 Axios - HTTP Client
+
+
 Bootstrap 5 - CSS Framework
+
+
 Vite - Build Tool
+
+
 # Persyaratan Sistem
 PHP 8.2 atau lebih tinggi
+
+
 Composer
+
+
 Node.js 18+ dan npm
+
+
 MySQL/MariaDB
+
+
 Git
+
+
 # Langkah Instalasi
+
+
 1. Clone Repository
+
+
 bash
+
+
 git clone <repository-url>
+
+
 cd task-management
+
+
 2. Setup Backend
+
+
 bash
+
+
 cd backend
+
  
 ### Install dependencies
 composer install
@@ -56,8 +118,11 @@ php artisan migrate
  
 ### Start development server
 php artisan serve
-3. Setup Frontend
+ 
+### Setup Frontend
 bash
+
+
 cd frontend
  
 ### Install dependencies
@@ -65,9 +130,14 @@ npm install
  
 ### Start development server
 npm run dev
-4. Akses Aplikasi
-Frontend: http://localhost:5173
+
+### Akses Aplikasi
+Frontend: http://localhost:5173 
+
+
 Backend API: http://localhost:8000
+
+
 # Informasi Login Dummy
 Gunakan akun berikut untuk login:
 
