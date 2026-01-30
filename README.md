@@ -112,10 +112,10 @@ Backend API: http://localhost:8000
 Gunakan akun berikut untuk login:
 
 
-Username: Ardiyan
+Username: Ardiyan,Ardiyas
 
 
-Password: diyan123
+Password: diyan123,diyas123
 
 
 atau menggunakan endpoint register
