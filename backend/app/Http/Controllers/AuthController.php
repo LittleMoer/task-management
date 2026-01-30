@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -24,7 +24,6 @@ class AuthController extends Controller
         ]);
 
         $token = auth('api')->login($user);
-
         return $this->respondWithToken($token);
     }
 
@@ -34,11 +33,9 @@ class AuthController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
-
         if (! $token = auth('api')->attempt($credentials)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
-
         return $this->respondWithToken($token);
     }
 
@@ -49,7 +46,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-        JWTAuth::invalidate(JWTAuth::getToken());
+        auth('api')->logout();
     
         return response()->json(['message' => 'Logged out']);
     }
@@ -64,7 +61,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60,
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
         ]);
     }
 }
