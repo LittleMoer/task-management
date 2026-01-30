@@ -99,6 +99,10 @@ sql
 Users memiliki banyak Tasks (One-to-Many)
 Tasks dimiliki oleh satu User (Many-to-One)
 
+# Tampilan Utama
+![Login Page](Halaman_login.png)
+![Main Page](Halaman_utama.png)
+
 ## Docker Setup
  
 ### Development
