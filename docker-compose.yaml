@@ -7,14 +7,17 @@ services:
     environment:
       MYSQL_DATABASE: task-management
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: root
-      MYSQL_USER: root
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - task-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # PHP/Laravel Backend
   backend:
@@ -34,11 +37,18 @@ services:
       - DB_DATABASE=task-management
       - DB_USERNAME=root
       - DB_PASSWORD=root
+      - APP_ENV=production
+      - APP_DEBUG=false
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - task-network
-    command: sh -c "composer install && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Node.js/Vue Frontend
   frontend:
@@ -48,18 +58,20 @@ services:
     container_name: task-frontend
     restart: unless-stopped
     working_dir: /app
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     ports:
-      - "5173:5173"
+      - "80:80"
     environment:
-      - VITE_API_URL=http://localhost:8000/api
+      - VITE_API_URL=http://backend:8000/api
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - task-network
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   mysql_data:
