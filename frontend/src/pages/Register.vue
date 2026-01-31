@@ -60,12 +60,15 @@ const onSubmit = async () => {
     });
     localStorage.setItem('access_token', data.access_token);
     router.push({ name: 'dashboard' });
-  } catch {
-    error.value = 'Registration failed';
+  } catch (err) {
+    // Tampilkan error detail dari backend
+    if (err.response?.status === 422 && err.response?.data?.errors) {
+      const errors = err.response.data.errors;
+      const errorMessages = Object.values(errors).flat();
+      error.value = errorMessages.join(', ');
+    } else {
+      error.value = err.response?.data?.message || 'Registration failed';
+    }
   }
-};
-
-const goLogin = () => {
-  router.push({ name: 'login' });
 };
 </script>
