@@ -19,8 +19,8 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 10
+      start_period: 60s
 
   # PHP/Laravel Backend
   backend:
@@ -48,7 +48,6 @@ services:
       # Laravel Configuration
       - APP_NAME="Task Management"
       - APP_ENV=local
-      - APP_KEY=base64:YOUR_APP_KEY_HERE
       - APP_DEBUG=true
       - APP_URL=http://localhost:8000
       
@@ -58,7 +57,6 @@ services:
       - QUEUE_CONNECTION=sync
       
       # JWT Configuration
-      - JWT_SECRET=your_jwt_secret_key_here_change_this_in_production
       - JWT_TTL=60
       - JWT_REFRESH_TTL=20160
       
@@ -73,8 +71,9 @@ services:
       - task-network
     command: >
       sh -c "
-        php artisan key:generate &&
-        php artisan jwt:secret &&
+        chmod -R 777 storage bootstrap/cache &&
+        php artisan key:generate --force &&
+        php artisan jwt:secret --force &&
         php artisan config:cache &&
         php artisan migrate --force &&
         php artisan serve --host=0.0.0.0 --port=8000

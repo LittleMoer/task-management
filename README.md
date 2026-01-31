@@ -173,6 +173,10 @@ cd task-management
 # Jalankan dengan Docker
 docker-compose up -d --build
 # terkadang dependency backend terlihat error,namun di docker berjalan 
+# Pastikan JWT Secret dan App Key sudah Tergenerated untuk memastikan koneksi ke docker aman
+docker exec -it task-backend php artisan jwt:secret
+
+docker exec -it task-backend php artisan key:generate
  
 # Akses aplikasi
 # Frontend: http://localhost:5173
@@ -185,6 +189,8 @@ docker-compose -f docker-compose.prod.yaml up -d --build
  
 # Akses aplikasi
 # http://localhost (dengan nginx)
+
+
 Docker Commands
 bash
 # Lihat status
