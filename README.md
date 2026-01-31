@@ -172,6 +172,7 @@ cd task-management
  
 # Jalankan dengan Docker
 docker-compose up -d --build
+# terkadang dependency backend terlihat error,namun di docker berjalan 
  
 # Akses aplikasi
 # Frontend: http://localhost:5173
