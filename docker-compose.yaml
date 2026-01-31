@@ -7,15 +7,16 @@ services:
     environment:
       MYSQL_DATABASE: task-management
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: taskuser
+      MYSQL_PASSWORD: taskpass
     ports:
       - "3306:3306"
     volumes:
-       - mysql_data:/var/lib/mysql
-
+      - mysql_data:/var/lib/mysql
     networks:
       - task-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,24 +33,52 @@ services:
     volumes:
       - ./backend:/var/www/html
       - ./backend/vendor:/var/www/html/vendor
+      - ./backend/storage:/var/www/html/storage
     ports:
       - "8000:8000"
     environment:
+      # Database Configuration
       - DB_CONNECTION=mysql
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_DATABASE=task-management
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-      - APP_ENV=production
-      - APP_DEBUG=false
+      - DB_USERNAME=taskuser
+      - DB_PASSWORD=taskpass
+      
+      # Laravel Configuration
+      - APP_NAME="Task Management"
       - APP_ENV=local
+      - APP_KEY=base64:YOUR_APP_KEY_HERE
       - APP_DEBUG=true
+      - APP_URL=http://localhost:8000
+      
+      # Cache & Session
+      - CACHE_DRIVER=file
+      - SESSION_DRIVER=file
+      - QUEUE_CONNECTION=sync
+      
+      # JWT Configuration
+      - JWT_SECRET=your_jwt_secret_key_here_change_this_in_production
+      - JWT_TTL=60
+      - JWT_REFRESH_TTL=20160
+      
+      # Log Configuration
+      - LOG_CHANNEL=stack
+      - LOG_LEVEL=debug
+      
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - task-network
+    command: >
+      sh -c "
+        php artisan key:generate &&
+        php artisan jwt:secret &&
+        php artisan config:cache &&
+        php artisan migrate --force &&
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
 
   # Node.js/Vue Frontend
   frontend:
@@ -63,6 +92,7 @@ services:
       - "5173:80"
     environment:
       - VITE_API_URL=http://localhost:8000/api
+      - NODE_ENV=production
     depends_on:
       backend:
         condition: service_started
@@ -71,6 +101,7 @@ services:
 
 volumes:
   mysql_data:
+    driver: local
 
 networks:
   task-network:
